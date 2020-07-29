@@ -22,7 +22,8 @@ const (
 	Dom                                    // Day of month field, default *
 	Month                                  // Month field, default *
 	Dow                                    // Day of week field, default *
-	DowOptional                            // Optional day of week field, default *
+	Year                                   // Year field, default *
+	YearOptional                           // Optional year field, default *
 	Descriptor                             // Allow descriptors such as @monthly, @weekly, etc.
 )
 
@@ -33,12 +34,14 @@ var places = []ParseOption{
 	Dom,
 	Month,
 	Dow,
+	Year,
 }
 
 var defaults = []string{
 	"0",
 	"0",
 	"0",
+	"*",
 	"*",
 	"*",
 	"*",
@@ -70,7 +73,7 @@ type Parser struct {
 //
 func NewParser(options ParseOption) Parser {
 	optionals := 0
-	if options&DowOptional > 0 {
+	if options&YearOptional > 0 {
 		optionals++
 	}
 	if options&SecondOptional > 0 {
@@ -136,6 +139,7 @@ func (p Parser) Parse(spec string) (Schedule, error) {
 		dayofmonth = field(fields[3], dom)
 		month      = field(fields[4], months)
 		dayofweek  = field(fields[5], dow)
+		year       = field(fields[6], years)
 	)
 	if err != nil {
 		return nil, err
@@ -148,6 +152,7 @@ func (p Parser) Parse(spec string) (Schedule, error) {
 		Dom:      dayofmonth,
 		Month:    month,
 		Dow:      dayofweek,
+		Year:     year,
 		Location: loc,
 	}, nil
 }
@@ -164,8 +169,8 @@ func normalizeFields(fields []string, options ParseOption) ([]string, error) {
 		options |= Second
 		optionals++
 	}
-	if options&DowOptional > 0 {
-		options |= Dow
+	if options&YearOptional > 0 {
+		options |= Year
 		optionals++
 	}
 	if optionals > 1 {
@@ -192,7 +197,7 @@ func normalizeFields(fields []string, options ParseOption) ([]string, error) {
 	// Populate the optional field if not provided
 	if min < max && len(fields) == min {
 		switch {
-		case options&DowOptional > 0:
+		case options&YearOptional > 0:
 			fields = append(fields, defaults[5]) // TODO: improve access to default
 		case options&SecondOptional > 0:
 			fields = append([]string{defaults[0]}, fields...)

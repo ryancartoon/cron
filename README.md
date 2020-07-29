@@ -3,6 +3,8 @@
 
 # cron
 
+添加year的支持.
+
 Cron V3 has been released!
 
 To download the specific tagged release, run:

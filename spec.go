@@ -1,11 +1,14 @@
 package cron
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // SpecSchedule specifies a duty cycle (to the second granularity), based on a
 // traditional crontab specification. It is computed initially and stored as bit sets.
 type SpecSchedule struct {
-	Second, Minute, Hour, Dom, Month, Dow uint64
+	Second, Minute, Hour, Dom, Month, Dow, Year uint64
 
 	// Override location for this schedule.
 	Location *time.Location
@@ -23,6 +26,7 @@ var (
 	minutes = bounds{0, 59, nil}
 	hours   = bounds{0, 23, nil}
 	dom     = bounds{1, 31, nil}
+	years   = bounds{0, 59, nil}
 	months  = bounds{1, 12, map[string]uint{
 		"jan": 1,
 		"feb": 2,
@@ -90,6 +94,17 @@ func (s *SpecSchedule) Next(t time.Time) time.Time {
 WRAP:
 	if t.Year() > yearLimit {
 		return time.Time{}
+	}
+
+	// Find the first applicable month.
+	// If it's this month, then do nothing.
+	fmt.Println(t)
+	for 1<<uint(t.Year()-2000)&s.Year == 0 {
+		if !added {
+			added = true
+			t = t.AddDate(1, 0, 0)
+		}
+		t = time.Date(t.Year(), time.January, 1, 0, 0, 0, 0, t.Location())
 	}
 
 	// Find the first applicable month.

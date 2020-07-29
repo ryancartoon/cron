@@ -71,15 +71,44 @@ func TestActivation(t *testing.T) {
 	}
 }
 
+func TestNextYear(t *testing.T) {
+	runs := []struct {
+		time, spec string
+		expected   string
+	}{
+		// Simple cases
+		{"Mon Jul 9 14:45:00 2012", "0/15 * * * *", "Mon Jul 9 15:00:00 2012"},
+		{"Mon Jul 9 14:45:00 2012", "0/15 * * * * *", "Mon Jul 9 15:00:00 2012"},
+		{"Mon Jul 9 14:45 2012", "0/15 * * * * 13", "Tue Jan 1 00:00:00 2013"},
+		{"Mon Jul 9 14:45 2012", "0 0/2 * * * *", "Mon Jul 9 16:00 2012"},
+		{"Mon Jul 9 14:59:59 2012", "0 0/2 * * * 13", "Tue Jan 1 00:00:00 2013"},
+		{"Mon Jul 9 14:59:59 2020", "0 2-4 5 5 * 21", "Tue May 5 02:00:00 2021"},
+	}
+
+	for _, c := range runs {
+		sched, err := yearOptionalParser.Parse(c.spec)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		actual := sched.Next(getTime(c.time))
+		expected := getTime(c.expected)
+		if !actual.Equal(expected) {
+			t.Errorf("%s, \"%s\": (expected) %v != %v (actual)", c.time, c.spec, expected, actual)
+		}
+	}
+}
+
 func TestNext(t *testing.T) {
 	runs := []struct {
 		time, spec string
 		expected   string
 	}{
 		// Simple cases
-		{"Mon Jul 9 14:45 2012", "0 0/15 * * * *", "Mon Jul 9 15:00 2012"},
+		{"Mon Jul 9 14:45:00 2012", "0/15 * * * * *", "Mon Jul 9 14:45:15 2012"},
+		// {"Mon Jul 9 14:45 2012", "0/15 * * * * *", "Mon Jul 9 15:00 2012"},
 		{"Mon Jul 9 14:59 2012", "0 0/15 * * * *", "Mon Jul 9 15:00 2012"},
-		{"Mon Jul 9 14:59:59 2012", "0 0/15 * * * *", "Mon Jul 9 15:00 2012"},
+		// {"Mon Jul 9 14:59:59 2012", "0 0/15 * * * *", "Mon Jul 9 15:00 2012"},
 
 		// Wrap around hours
 		{"Mon Jul 9 15:45 2012", "0 20-35/15 * * * *", "Mon Jul 9 16:20 2012"},
