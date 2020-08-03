@@ -3,7 +3,10 @@
 
 # cron
 
-添加year的支持.
+cron spec添加year的支持.
+只支持2000-2059年。在cron spec中，只需要给出后2位数字，'20'被省略掉。
+
+    "0 2-4 5 5 * 22"
 
 Cron V3 has been released!
 

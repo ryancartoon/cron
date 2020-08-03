@@ -1,7 +1,6 @@
 package cron
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -96,14 +95,14 @@ WRAP:
 		return time.Time{}
 	}
 
-	// Find the first applicable month.
-	// If it's this month, then do nothing.
-	fmt.Println(t)
+	// Find the first applicable year.
+	// If it's this year, then do nothing.
 	for 1<<uint(t.Year()-2000)&s.Year == 0 {
 		if !added {
 			added = true
-			t = t.AddDate(1, 0, 0)
 		}
+		t = t.AddDate(1, 0, 0)
+		// set the date at the beginning of the year.
 		t = time.Date(t.Year(), time.January, 1, 0, 0, 0, 0, t.Location())
 	}
 

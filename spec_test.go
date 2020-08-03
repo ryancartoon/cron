@@ -71,18 +71,18 @@ func TestActivation(t *testing.T) {
 	}
 }
 
-func TestNextYear(t *testing.T) {
+func TestNextWithYearSupport(t *testing.T) {
 	runs := []struct {
 		time, spec string
 		expected   string
 	}{
-		// Simple cases
 		{"Mon Jul 9 14:45:00 2012", "0/15 * * * *", "Mon Jul 9 15:00:00 2012"},
 		{"Mon Jul 9 14:45:00 2012", "0/15 * * * * *", "Mon Jul 9 15:00:00 2012"},
 		{"Mon Jul 9 14:45 2012", "0/15 * * * * 13", "Tue Jan 1 00:00:00 2013"},
 		{"Mon Jul 9 14:45 2012", "0 0/2 * * * *", "Mon Jul 9 16:00 2012"},
 		{"Mon Jul 9 14:59:59 2012", "0 0/2 * * * 13", "Tue Jan 1 00:00:00 2013"},
 		{"Mon Jul 9 14:59:59 2020", "0 2-4 5 5 * 21", "Tue May 5 02:00:00 2021"},
+		{"Mon Jul 9 14:59:59 2020", "0 2-4 5 5 * 22", "Tue May 5 02:00:00 2022"},
 	}
 
 	for _, c := range runs {
